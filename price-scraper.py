@@ -153,7 +153,7 @@ for url in urls:
                                           "div#corePriceDisplay_desktop_feature_div span.a-price-whole").text.replace(
             ",", "")
         price_fraction = driver.find_element(By.CSS_SELECTOR, "span.a-price-fraction").text
-        price = float(price_whole + price_fraction)
+        price = float(f"{price_whole}.{price_fraction}")
     except:
         price = 0.0
 
