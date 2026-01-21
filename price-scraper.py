@@ -89,9 +89,10 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 import time
+from datetime import datetime
+from zoneinfo import ZoneInfo
+import json
 
-
-# --- General category inference function ---
 def get_general_category(soup_text, title):
     # Breadcrumb
     if "breadcrumb" in soup_text.lower():  # simplified check
@@ -130,10 +131,11 @@ chrome_options.add_argument("--lang=en-US")
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
 # --- List of product URLs ---
-urls = [
-    "https://www.amazon.com/dp/B0FN9NWW62",
-    # Add more Amazon product URLs here
-]
+with open('website-url.json', 'r') as file:
+    urls = json.load(file)
+
+with open('products-list.json', 'r') as file:
+    urls = json.load(file)
 
 data_list = []
 
@@ -165,7 +167,8 @@ for url in urls:
         "title": title,
         "price": price,
         "url": url,
-        "category": category
+        "category": category,
+        "date":datetime.now(ZoneInfo("America/New_York"))
     })
 
 driver.quit()
