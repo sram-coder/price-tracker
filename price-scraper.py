@@ -135,7 +135,7 @@ with open('website-url.json', 'r') as file:
     urls = json.load(file)
 
 with open('products-list.json', 'r') as file:
-    urls = json.load(file)
+    products = json.load(file)
 
 data_list = []
 
@@ -164,6 +164,7 @@ for url in urls:
     category = get_general_category(soup_text, title)
 
     data_list.append({
+        "product name": product,
         "title": title,
         "price": price,
         "url": url,
