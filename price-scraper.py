@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 import json
 import asyncio
 from concurrent.futures.thread import ThreadPoolExecutor
+import aiofiles
 
 def get_general_category(soup_text, title):
     # Breadcrumb
@@ -39,6 +40,19 @@ def get_general_category(soup_text, title):
     return "Other"
 
 
+async def read_json_file(file_path):
+    async with aiofiles.open(file_path, 'r') as file:
+        return json.loads(await file.read())
+
+async def open_json():
+    urls_task = asyncio.create_task(read_json_file('website-url.json'))
+    products_task = asyncio.create_task(read_json_file('products-list.json'))
+
+    urls, products = await asyncio.gather(urls_task, products_task)
+    return urls, products
+
+
+
 # --- Selenium setup ---
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # run in background
@@ -48,34 +62,13 @@ chrome_options.add_argument("--lang=en-US")
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
-with open('website-url.json', 'r') as file:
-    urls = json.load(file)
-
-with open('products-list.json', 'r') as file:
-    products = json.load(file)
-
 data_list = []
 
-for url in urls:
+for url in urls["urls"]:
     driver.get(url)
     time.sleep(3)  # wait for page to load fully
 
-    # Grab title
-    try:
-        title = driver.find_element(By.ID, "productTitle").text.strip()
-    except:
-        title = "Unknown Title"
-
-    # Grab price
-    try:
-        price_whole = driver.find_element(By.CSS_SELECTOR,
-                                          "div#corePriceDisplay_desktop_feature_div span.a-price-whole").text.replace(
-            ",", "")
-        price_fraction = driver.find_element(By.CSS_SELECTOR, "span.a-price-fraction").text
-        price = float(f"{price_whole}.{price_fraction}")
-    except:
-        price = 0.0
-
+    
     # Grab category
     soup_text = driver.page_source
     category = get_general_category(soup_text, title)
@@ -96,3 +89,15 @@ df = pd.DataFrame(data_list)
 df.to_csv("amazon_products.csv", index=False)
 
 print(df)
+
+
+
+async def main():
+    urls, products = await open_json()
+    loop = asyncio.get_running_loop()
+    with ThreadPoolExecutor() as pool:
+        await loop.run_in_executor(pool, scrape_prices, urls, products)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())   
