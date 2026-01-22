@@ -92,6 +92,8 @@ import time
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import json
+import asyncio
+from concurrent.futures.thread import ThreadPoolExecutor
 
 def get_general_category(soup_text, title):
     # Breadcrumb

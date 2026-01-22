@@ -1,4 +1,12 @@
-[
-  "Apple Airpods Pro 3",
-  "Apple iPad Pro 11 inch M5"
-]
+{
+  "products": [
+    {
+      "make": "Apple",
+      "model": "Airpods Pro 3"
+    },
+    {
+      "make": "Apple",
+      "model": "Macbook Pro M5 512GB 24 GB RAM"
+    }
+  ]
+}
