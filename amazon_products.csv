@@ -1,3 +1,13 @@
-title,price,url,category,date
-"Apple AirPods Pro 3 Wireless Earbuds, Active Noise Cancellation, Live Translation, Heart Rate Sensing,Hearing Aid Feature,Bluetooth Headphones,Spatial Audio, High-Fidelity Sound, USB-C Charging, White",239.95,https://www.amazon.com/Apple-Cancellation-Translation-Headphones-High-Fidelity/dp/B0FQFB8FMG/ref=sr_1_6?s=electronics&sr=1-6,Electronics,2026-01-21 11:31:03.955938-05:00
-"Apple iPad Pro 11-inch (M5): Ultra Retina XDR Display, 256GB, Landscape 12MP Front Camera/12MP Back Camera, LiDAR Scanner, Wi-Fi 7 with Apple N1, Face ID, All-Day Battery Life — Space Black",899.0,https://www.amazon.com/Apple-iPad-Pro-11-inch-Landscape/dp/B0FWCXJVHN?ref_=ast_sto_dp,Other,2026-01-21 11:31:10.367717-05:00
+product name,make,model,url,category,date
+Apple Airpods Pro 3,Apple,Airpods Pro 3,https://amazon.com,Other,2026-01-22 22:51:00.602029-05:00
+Apple Airpods Pro 3,Apple,Airpods Pro 3,https://bestbuy.com,Other,2026-01-22 22:51:12.456714-05:00
+Apple Airpods Pro 3,Apple,Airpods Pro 3,https://walmart.com,Other,2026-01-22 22:51:19.000027-05:00
+Apple Airpods Pro 3,Apple,Airpods Pro 3,https://bhphotovideo.com,Other,2026-01-22 22:51:22.315021-05:00
+Apple Airpods Pro 3,Apple,Airpods Pro 3,https://costco.com,Electronics,2026-01-22 22:51:29.202284-05:00
+Apple Airpods Pro 3,Apple,Airpods Pro 3,https://barnesandnoble.com,Electronics,2026-01-22 22:51:39.130806-05:00
+Apple Macbook Pro M5 512GB 24 GB RAM,Apple,Macbook Pro M5 512GB 24 GB RAM,https://amazon.com,Electronics,2026-01-22 22:51:45.607327-05:00
+Apple Macbook Pro M5 512GB 24 GB RAM,Apple,Macbook Pro M5 512GB 24 GB RAM,https://bestbuy.com,Electronics,2026-01-22 22:51:55.138211-05:00
+Apple Macbook Pro M5 512GB 24 GB RAM,Apple,Macbook Pro M5 512GB 24 GB RAM,https://walmart.com,Electronics,2026-01-22 22:52:01.580120-05:00
+Apple Macbook Pro M5 512GB 24 GB RAM,Apple,Macbook Pro M5 512GB 24 GB RAM,https://bhphotovideo.com,Electronics,2026-01-22 22:52:07.175465-05:00
+Apple Macbook Pro M5 512GB 24 GB RAM,Apple,Macbook Pro M5 512GB 24 GB RAM,https://costco.com,Electronics,2026-01-22 22:52:14.449984-05:00
+Apple Macbook Pro M5 512GB 24 GB RAM,Apple,Macbook Pro M5 512GB 24 GB RAM,https://barnesandnoble.com,Electronics,2026-01-22 22:52:23.352096-05:00
