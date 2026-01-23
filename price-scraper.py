@@ -1,16 +1,13 @@
+import json
+import time
+import pandas as pd
+from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-import pandas as pd
-import time
-from datetime import datetime
 from zoneinfo import ZoneInfo
-import json
-import asyncio
-from concurrent.futures.thread import ThreadPoolExecutor
-import aiofiles
+from webdriver_manager.chrome import ChromeDriverManager
+
 
 def get_general_category(soup_text, title):
     # Breadcrumb
@@ -40,64 +37,64 @@ def get_general_category(soup_text, title):
     return "Other"
 
 
-async def read_json_file(file_path):
-    async with aiofiles.open(file_path, 'r') as file:
-        return json.loads(await file.read())
+def read_json_file(file_path):
+    with open(file_path, 'r') as file:
+        return json.load(file)
 
-async def open_json():
-    urls_task = asyncio.create_task(read_json_file('website-url.json'))
-    products_task = asyncio.create_task(read_json_file('products-list.json'))
 
-    urls, products = await asyncio.gather(urls_task, products_task)
+def open_json():
+    urls = read_json_file('website-url.json')
+    products = read_json_file('products-list.json')
     return urls, products
 
 
+def main():
+    # --- Selenium setup ---
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # run in background
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--lang=en-US")
 
-# --- Selenium setup ---
-chrome_options = Options()
-chrome_options.add_argument("--headless")  # run in background
-chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--window-size=1920,1080")
-chrome_options.add_argument("--lang=en-US")
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    data_list = []
 
-data_list = []
+    # Load the URLs and product details
+    urls, products = open_json()
 
-for url in urls["urls"]:
-    driver.get(url)
-    time.sleep(3)  # wait for page to load fully
+    # Loop through the products in the products list
+    for product in products["products"]:
+        make = product["make"]
+        model = product["model"]
 
-    
-    # Grab category
-    soup_text = driver.page_source
-    category = get_general_category(soup_text, title)
+        # Loop through each URL in the urls file
+        for url in urls["urls"]:
+            driver.get(f"https://{url}")
+            time.sleep(3)  # wait for page to load fully
 
-    data_list.append({
-        "product name": product,
-        "title": title,
-        "price": price,
-        "url": url,
-        "category": category,
-        "date":datetime.now(ZoneInfo("America/New_York"))
-    })
+            # Grab category from the page
+            soup_text = driver.page_source
+            category = get_general_category(soup_text, model)  # using model as title here
 
-driver.quit()
+            # Append product data to the list
+            data_list.append({
+                "product name": f"{make} {model}",
+                "make": make,
+                "model": model,
+                "url": f"https://{url}",
+                "category": category,
+                "date": datetime.now(ZoneInfo("America/New_York"))
+            })
 
-# --- Save to CSV ---
-df = pd.DataFrame(data_list)
-df.to_csv("amazon_products.csv", index=False)
+    driver.quit()
 
-print(df)
+    # --- Save to CSV ---
+    df = pd.DataFrame(data_list)
+    df.to_csv("amazon_products.csv", index=False)
 
-
-
-async def main():
-    urls, products = await open_json()
-    loop = asyncio.get_running_loop()
-    with ThreadPoolExecutor() as pool:
-        await loop.run_in_executor(pool, scrape_prices, urls, products)
+    print(df)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())   
+    main()
