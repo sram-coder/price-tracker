@@ -38,7 +38,7 @@ def get_general_category(soup_text, title):
     ]):
         return "Home & Kitchen"
 
-    return "Other"
+    return "Category not found"
 
 
 def read_json_file(file_path):
