@@ -61,6 +61,7 @@ def amazon_product_details(driver, make, model, asin):
         "model": model,
         "price": "null",
         "asin": asin,
+        "sku": "null",
         "date": datetime.now(ZoneInfo("America/New_York"))
 
     }
@@ -88,6 +89,7 @@ def amazon_product_details(driver, make, model, asin):
                 "model": model,
                 "price": price,
                 "asin": asin,
+                "sku": "null",
                 "date": datetime.now(ZoneInfo("America/New_York"))
             }
 
@@ -95,6 +97,78 @@ def amazon_product_details(driver, make, model, asin):
         print(f"Timeout while processing {make} {model}")
 
     return data
+
+
+
+def bestbuy_sku(driver, make, model):
+    driver.get("https://www.bestbuy.com")
+
+    search_box = WebDriverWait(driver, 15).until(
+        EC.presence_of_element_located((By.ID, "autocomplete-search-bar")))
+    
+    search_box.send_keys(f"{make} {model}")
+    search_box.send_keys(Keys.ENTER)
+
+    results = WebDriverWait(driver, 15).until(
+        EC.presence_of_all_elements_located(
+            (By.CSS_SELECTOR, 'div[data-component-type="s-search-result"]')))
+
+    for result in results:
+        sku = result.get_attribute("data-sku-id")
+        if sku:
+            return sku
+
+    return None
+
+
+def bestbuy_product_details(driver, make, model, sku):
+    """
+    Searches Best Buy for make + model and returns the first product's details.
+    """
+    driver.get(f"https://www.bestbuy.com/site/{make}+{model}/{sku}.p")
+
+    data = {
+        "name": "Product not found",
+        "make": make,
+        "model": model,
+        "price": "null",
+        "asin": "null",
+        "sku": sku,
+        "date": datetime.now(ZoneInfo("America/New_York"))
+
+    }
+
+    try:
+            WebDriverWait(driver, 10).until(
+            EC.url_contains(sku))
+            title_el = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located(By.CSS_SELECTOR, "[data-component-name='ProductHeader'] h1"))
+            title = title_el.text
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "[data-sticky-media-gallery] .priceView-hero-price span"))
+            )
+            
+            try:
+                price = driver.find_element(By.CSS_SELECTOR, "[data-sticky-media-gallery] .priceView-hero-price span").text
+            except:
+                price = "null"
+
+            data = {
+                "name": title,
+                "make": make,
+                "model": model,
+                "price": price,
+                "asin": "null",
+                "sku": sku,
+                "date": datetime.now(ZoneInfo("America/New_York"))
+            }
+
+    except TimeoutException:
+        print(f"Timeout while processing {make} {model}")
+
+    return data
+
+
 
 def main():
     """Main function for running the Amazon price scraper."""
@@ -112,13 +186,21 @@ def main():
     for product in products.get("products", []):
         make = product.get("make", "")
         model = product.get("model", "")
+        count = 0
 
         for url_item in urls.get("urls", []):
-            asin = amazon_asin(driver, make, model)
-            data = amazon_product_details(driver, make, model, asin)
-            data_list.append(data)
-            time.sleep(2)  # polite delay to avoid being blocked
+            if count == 0:
+                asin = amazon_asin(driver, make, model)
+                data = amazon_product_details(driver, make, model, asin)
+                data_list.append(data)
+                time.sleep(2)  
 
+            if count == 1:
+                sku = bestbuy_sku(driver, make, model)
+                data = bestbuy_product_details(driver, make, model, sku)
+                data_list.append(data)
+                time.sleep(2)
+            count += 1
     driver.quit()
 
     # Save results to CSV
