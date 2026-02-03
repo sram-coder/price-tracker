@@ -15,7 +15,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import re
 from urllib.parse import urlparse, parse_qs
-from selenium.common.exceptions import StaleElementReferenceException
 
 def read_json_file(file_path):
     """Reads a JSON file and returns a dictionary."""
@@ -129,30 +128,29 @@ def bestbuy_product_details(driver, make, model):
     }
 
     try:
-            wait = WebDriverWait(driver, 20)
-
-
+            wait = WebDriverWait(driver, 60)
+            print("1")
             first_result = wait.until(EC.element_to_be_clickable((By.XPATH, "(//a[contains(@href, '/product/')])[1]")))
+            print("2")
             first_result.click()
-            wait.until(
-                EC.url_contains("/product/"))
+            print("3")
             # wait for product page
-            title_el = wait.until(
+            #time.sleep(5)
+            title = wait.until(
                 EC.presence_of_element_located(
-                    (By.XPATH, "/html/body/div[6]/div[5]/div[1]/div/div[2]/h1")
+                    (By.CSS_SELECTOR, "h1.h4")
                 )
-            )
-            title = title_el.text
+            ).text
+            print("4:"+title)
 
-
-
-            price_el = (wait.until(
+            price = (wait.until(
                 EC.presence_of_element_located(
-                    (By.XPATH, "/html/body/div[6]/div[5]/div[1]/div/div[4]/div/div/div/div[1]/div/div[1]/div[1]/div[1]/div/div/div/div[1]/span")
+                    (By.CSS_SELECTOR, "span.font-sans.text-default.text-style-body-md-400.font-500.text-7.leading-7")
                 )
-            ))
+            )).text
+            print("5")
 
-            price = price_el
+
 
             url = driver.current_url
 
@@ -169,6 +167,83 @@ def bestbuy_product_details(driver, make, model):
                     "price": price,
                     "merchant sin": bsin,
                     "sku": sku,
+                    "site": "BestBuy",
+                    "date": datetime.now(ZoneInfo("America/New_York"))
+                }
+
+    except TimeoutException as e:
+        print(f"Timeout while processing {make} {model}:{e}")
+    except Exception as e:
+        print(f"Error while processing {make} {model}: {e}")
+    return data
+
+def walmart_product_details(driver, make, model):
+    """
+    Searches Best Buy for make + model and returns the first product's details.
+    """
+    driver.get("walmart.com")
+
+    search_box = WebDriverWait(driver, 15).until(
+        EC.presence_of_element_located(By.CSS_SELECTOR, 'input[aria-label="Search"]'))
+
+    search_box.clear()
+    search_box.send_keys(f"{make} {model}")
+    search_box.send_keys(Keys.ENTER)
+
+    data = {
+        "name": "Product not found",
+        "make": make,
+        "model": model,
+        "price": "null",
+        "merchant sin": "null",
+        "sku": "null",
+        "site": "Walmart",
+        "date": datetime.now(ZoneInfo("America/New_York"))
+    }
+
+    try:
+            wait = WebDriverWait(driver, 60)
+            print("1")
+            products = wait.until(
+                EC.presence_of_all_elements_located(
+                    (By.CSS_SELECTOR, "div[data-testid='item-stack']")
+                )
+            )
+            print("2")
+            first_result = products[0]
+            first_result.click()
+            print("3")
+            title = wait.until(
+                EC.presence_of_element_located(
+                    (By.ID, "main-title")
+                )
+            ).text
+            print("4:"+title)
+
+            price = (wait.until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "span.itemprop.price")
+                )
+            )).text
+            print("5:"+price)
+
+
+
+            url = driver.current_url
+
+            bsin_match = re.search(r"/product/[^/]+/([^/]+)/sku", url)
+            bsin = bsin_match.group(1) if bsin_match else None
+
+            sku_match = re.search(r"/sku/(\d+)", url)
+            sku = sku_match.group(1) if sku_match else None
+
+            data = {
+                    "name": title,
+                    "make": make,
+                    "model": model,
+                    "price": price,
+                    "merchant sin": "null",
+                    "sku": "null",
                     "site": "BestBuy",
                     "date": datetime.now(ZoneInfo("America/New_York"))
                 }
@@ -204,19 +279,23 @@ def main():
                         "make": make,
                         "model": model,
                         "price": "null",
-                        "asin": "null",
+                        "merchant sin": "null",
+                        "sku": "null",
+                        "site": "null",
                         "date": datetime.now(ZoneInfo("America/New_York"))
             }
 
             try:
-                if "amazon" in site:
-                    asin = amazon_asin(driver, make, model)
-                    if asin:
-                        data = amazon_product_details(driver, make, model, asin)
-                    else:
-                        print(f"Amazon product not found: {make} {model}")
-                elif "bestbuy" in site:
-                    data = bestbuy_product_details(driver, make, model)
+                #if "amazon" in site:
+                #    asin = amazon_asin(driver, make, model)
+                #    if asin:
+                #        data = amazon_product_details(driver, make, model, asin)
+                #    else:
+                 #       print(f"Amazon product not found: {make} {model}")
+                #elif "bestbuy" in site:
+                    #data = bestbuy_product_details(driver, make, model)
+                if "walmart" in site:
+                    data = walmart_product_details(driver, make, model)
 
                 data_list.append(data)
                 time.sleep(2)
