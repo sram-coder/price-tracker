@@ -14,6 +14,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import re
+import tempfile
 from urllib.parse import urlparse, parse_qs
 
 def read_json_file(file_path):
@@ -177,18 +178,18 @@ def bestbuy_product_details(driver, make, model):
         print(f"Error while processing {make} {model}: {e}")
     return data
 
-def walmart_product_details(driver, make, model):
-    """
-    Searches Best Buy for make + model and returns the first product's details.
-    """
-    driver.get("walmart.com")
+def costco_product_details(driver, make, model):
+    driver.get("https://www.costco.com")
 
-    search_box = WebDriverWait(driver, 15).until(
-        EC.presence_of_element_located(By.CSS_SELECTOR, 'input[aria-label="Search"]'))
+    wait = WebDriverWait(driver, 20)
+
+    search_box = wait.until(
+        EC.presence_of_element_located((By.ID, "search-field"))
+    )
 
     search_box.clear()
     search_box.send_keys(f"{make} {model}")
-    search_box.send_keys(Keys.ENTER)
+    search_box.send_keys(Keys.RETURN)
 
     data = {
         "name": "Product not found",
@@ -197,75 +198,72 @@ def walmart_product_details(driver, make, model):
         "price": "null",
         "merchant sin": "null",
         "sku": "null",
-        "site": "Walmart",
+        "site": "Costco",
         "date": datetime.now(ZoneInfo("America/New_York"))
     }
 
     try:
-            wait = WebDriverWait(driver, 60)
-            print("1")
-            products = wait.until(
-                EC.presence_of_all_elements_located(
-                    (By.CSS_SELECTOR, "div[data-testid='item-stack']")
-                )
+        # First product tile
+        first_product = wait.until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, "div.product-tile-set div.product")
             )
-            print("2")
-            first_result = products[0]
-            first_result.click()
-            print("3")
-            title = wait.until(
+        )
+
+        # Click the product link inside the tile
+        product_link = first_product.find_element(By.TAG_NAME, "a")
+        product_link.click()
+
+        # Product title
+        title = wait.until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, "h1")
+            )
+        ).text
+
+        # Try to get price (may not exist)
+        try:
+            price = wait.until(
                 EC.presence_of_element_located(
-                    (By.ID, "main-title")
+                    (By.CSS_SELECTOR, "[data-testid='price']")
                 )
             ).text
-            print("4:"+title)
+        except:
+            price = "Login required"
 
-            price = (wait.until(
-                EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, "span.itemprop.price")
-                )
-            )).text
-            print("5:"+price)
-
-
-
-            url = driver.current_url
-
-            bsin_match = re.search(r"/product/[^/]+/([^/]+)/sku", url)
-            bsin = bsin_match.group(1) if bsin_match else None
-
-            sku_match = re.search(r"/sku/(\d+)", url)
-            sku = sku_match.group(1) if sku_match else None
-
-            data = {
-                    "name": title,
-                    "make": make,
-                    "model": model,
-                    "price": price,
-                    "merchant sin": "null",
-                    "sku": "null",
-                    "site": "BestBuy",
-                    "date": datetime.now(ZoneInfo("America/New_York"))
-                }
+        data.update({
+            "name": title,
+            "price": price
+        })
 
     except TimeoutException as e:
-        print(f"Timeout while processing {make} {model}:{e}")
+        print(f"Timeout while processing {make} {model}: {e}")
     except Exception as e:
         print(f"Error while processing {make} {model}: {e}")
-    return data
 
+    return data
 
 
 def main():
     """Main function for running the Amazon price scraper."""
-    chrome_options = Options()
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument("--lang=en-US")
+
+    options = Options()
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--start-maximized")
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    options.add_experimental_option("useAutomationExtension", False)
+
+    driver = webdriver.Chrome(options=options)
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),
-        options=chrome_options)
-
+        options=options)
+    driver.get("https://example.com")
+    input("Press Enter to close")
+    driver.quit()
     data_list = []
     urls, products = open_json()
 
@@ -286,16 +284,16 @@ def main():
             }
 
             try:
-                #if "amazon" in site:
-                #    asin = amazon_asin(driver, make, model)
-                #    if asin:
-                #        data = amazon_product_details(driver, make, model, asin)
-                #    else:
-                 #       print(f"Amazon product not found: {make} {model}")
-                #elif "bestbuy" in site:
-                    #data = bestbuy_product_details(driver, make, model)
-                if "walmart" in site:
-                    data = walmart_product_details(driver, make, model)
+                if "amazon" in site:
+                    asin = amazon_asin(driver, make, model)
+                    if asin:
+                        data = amazon_product_details(driver, make, model, asin)
+                    else:
+                        print(f"Amazon product not found: {make} {model}")
+                elif "bestbuy" in site:
+                    data = bestbuy_product_details(driver, make, model)
+                if "costco" in site:
+                    data = costco_product_details(driver, make, model)
 
                 data_list.append(data)
                 time.sleep(2)
