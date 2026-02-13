@@ -35,10 +35,10 @@ def open_json():
 
 def amazon_asin(driver, make, model):
     '''Returns asin of product to search items more easily!'''
-    driver.get("https://www.amazon.com")
+    driver.get("https://www.amazon.com/ref=nav_logo")
     time.sleep(3)
 
-    search_box = driver.find_element(By.ID, "twotabsearchtextbox")
+    search_box = driver.find_element(By.CSS_SELECTOR, "input#twotabsearchtextbox")
     search_box.send_keys(f"{make} {model}")
     search_box.send_keys(Keys.ENTER)
 
@@ -113,6 +113,7 @@ def bestbuy_product_details(driver, make, model):
         EC.presence_of_element_located((By.ID, "autocomplete-search-bar"))
     )
 
+
     search_box.clear()
     search_box.send_keys(f"{make} {model}")
     search_box.send_keys(Keys.ENTER)
@@ -178,18 +179,91 @@ def bestbuy_product_details(driver, make, model):
         print(f"Error while processing {make} {model}: {e}")
     return data
 
+'''
+def bhphotovideo_product_details(driver, make, model):
+        """
+        Searches Best Buy for make + model and returns the first product's details.
+        """
+        driver.get("https://www.bhphotovideo.com")
+
+        search_box = WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR,"input[placeholder='Search']"))
+        )
+
+        search_box.clear()
+        search_box.send_keys(f"{make} {model}")
+        search_box.send_keys(Keys.ENTER)
+
+        data = {
+            "name": "Product not found",
+            "make": make,
+            "model": model,
+            "price": "null",
+            "merchant sin": "null",
+            "sku": "null",
+            "site": "B&H Photo Video",
+            "date": datetime.now(ZoneInfo("America/New_York"))
+        }
+
+        try:
+            wait = WebDriverWait(driver, 60)
+            print("1")
+            first_result = WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR,
+              'div[data-selenium="listingProductDetailSection"] > div[data-selenium="miniProductPage"]:first-child')))
+            print("2")
+            first_result.click()
+            print("3")
+            # wait for product page
+            # time.sleep(5)
+            title = wait.until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "h1[data-selenium='productTitle']")
+                )
+            ).text
+            print("4:" + title)
+
+            price = (wait.until(
+                EC.presence_of_element_located(
+                    (By.CSS_SELECTOR, "span[data-selenium='pricingPrice']")
+                )
+            )).text
+            print("5")
+
+            url = driver.current_url
+
+
+
+            data = {
+                "name": title,
+                "make": make,
+                "model": model,
+                "price": price,
+                "merchant sin": "null",
+                "sku": "null",
+                "site": "B&H Photo Video",
+                "date": datetime.now(ZoneInfo("America/New_York"))
+            }
+
+        except TimeoutException as e:
+            print(f"Timeout while processing {make} {model}:{e}")
+        except Exception as e:
+            print(f"Error while processing {make} {model}: {e}")
+        return data
+
+'''
 def costco_product_details(driver, make, model):
-    driver.get("https://www.costco.com")
+    """
+    Searches Best Buy for make + model and returns the first product's details.
+    """
+    driver.get("https://www.costco.com/")
 
-    wait = WebDriverWait(driver, 20)
-
-    search_box = wait.until(
-        EC.presence_of_element_located((By.ID, "search-field"))
-    )
+    search_box = WebDriverWait(driver, 15).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='Search Costco']")))
 
     search_box.clear()
     search_box.send_keys(f"{make} {model}")
-    search_box.send_keys(Keys.RETURN)
+    search_box.send_keys(Keys.ENTER)
 
     data = {
         "name": "Product not found",
@@ -203,44 +277,47 @@ def costco_product_details(driver, make, model):
     }
 
     try:
-        # First product tile
-        first_product = wait.until(
-            EC.presence_of_element_located(
-                (By.CSS_SELECTOR, "div.product-tile-set div.product")
-            )
-        )
-
-        # Click the product link inside the tile
-        product_link = first_product.find_element(By.TAG_NAME, "a")
-        product_link.click()
-
-        # Product title
+        wait = WebDriverWait(driver, 60)
+        print("1")
+        first_result = WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.ID,
+                                           'productList')))
+        print("2")
+        first_result.click()
+        print("3")
+        # wait for product page
+        # time.sleep(5)
         title = wait.until(
             EC.presence_of_element_located(
-                (By.CSS_SELECTOR, "h1")
+                (By.CSS_SELECTOR, "h1[data-selenium='productTitle']")
             )
         ).text
+        print("4:" + title)
 
-        # Try to get price (may not exist)
-        try:
-            price = wait.until(
-                EC.presence_of_element_located(
-                    (By.CSS_SELECTOR, "[data-testid='price']")
-                )
-            ).text
-        except:
-            price = "Login required"
+        price = (wait.until(
+            EC.presence_of_element_located(
+                (By.CSS_SELECTOR, "span[data-selenium='pricingPrice']")
+            )
+        )).text
+        print("5")
 
-        data.update({
+        url = driver.current_url
+
+        data = {
             "name": title,
-            "price": price
-        })
+            "make": make,
+            "model": model,
+            "price": price,
+            "merchant sin": "null",
+            "sku": "null",
+            "site": "B&H Photo Video",
+            "date": datetime.now(ZoneInfo("America/New_York"))
+        }
 
     except TimeoutException as e:
-        print(f"Timeout while processing {make} {model}: {e}")
+        print(f"Timeout while processing {make} {model}:{e}")
     except Exception as e:
         print(f"Error while processing {make} {model}: {e}")
-
     return data
 
 
@@ -251,19 +328,29 @@ def main():
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
-
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("--start-maximized")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option("useAutomationExtension", False)
+    options.add_argument("--disable-session-crashed-bubble")
+    options.add_argument("--disable-restore-session-state")
+    options.add_argument("--incognito")
 
-    driver = webdriver.Chrome(options=options)
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),
         options=options)
-    driver.get("https://example.com")
-    input("Press Enter to close")
-    driver.quit()
+
+    driver.get("https://www.bhphotovideo.com")
+    search_box = WebDriverWait(driver, 15).until(
+        EC.presence_of_element_located((By.CSS_SELECTOR, "input[placeholder='Search']"))
+    )
+
+    time.sleep(2)
+    search_box.send_keys(f"apple airpods pro")
+    print("1")
+    time.sleep(2)
+    search_box.send_keys(Keys.ENTER)
+    print("2")
     data_list = []
     urls, products = open_json()
 
@@ -283,25 +370,25 @@ def main():
                         "date": datetime.now(ZoneInfo("America/New_York"))
             }
 
-            try:
-                if "amazon" in site:
-                    asin = amazon_asin(driver, make, model)
-                    if asin:
-                        data = amazon_product_details(driver, make, model, asin)
-                    else:
-                        print(f"Amazon product not found: {make} {model}")
-                elif "bestbuy" in site:
-                    data = bestbuy_product_details(driver, make, model)
-                if "costco" in site:
-                    data = costco_product_details(driver, make, model)
+            #try:
+                #if "amazon" in site:
+                    #asin = amazon_asin(driver, make, model)
+                   # if asin:
+                  #      data = amazon_product_details(driver, make, model, asin)
+                 #       data_list.append(data)
 
-                data_list.append(data)
-                time.sleep(2)
-            except Exception as e:
-                print(f"Error processing {make} {model}: {e}")
+                #elif "bestbuy" in site:
+                #    data = bestbuy_product_details(driver, make, model)
+                #    data_list.append(data)
+                #elif "costco" in site:
+                 #   data = costco_product_details(driver, make, model)
+                 #   data_list.append(data)
+
+            #except Exception as e:
+             #   print(f"Error processing {make} {model}: {e}")
 
 
-                data_list.append(data)
+              #  data_list.append(data)
 
             time.sleep(2)
 
