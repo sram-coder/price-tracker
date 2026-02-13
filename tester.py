@@ -3,7 +3,6 @@
 import json, time, csv, pandas as pd
 from datetime import datetime
 from zoneinfo import ZoneInfo
-
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -179,7 +178,7 @@ def bestbuy_product_details(driver, make, model):
         print(f"Error while processing {make} {model}: {e}")
     return data
 
-'''
+
 def bhphotovideo_product_details(driver, make, model):
         """
         Searches Best Buy for make + model and returns the first product's details.
@@ -251,7 +250,7 @@ def bhphotovideo_product_details(driver, make, model):
             print(f"Error while processing {make} {model}: {e}")
         return data
 
-'''
+
 def costco_product_details(driver, make, model):
     """
     Searches Best Buy for make + model and returns the first product's details.
