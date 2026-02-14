@@ -32,6 +32,30 @@ def open_json():
     products = read_json_file("products-list.json")
     return urls, products
 
+def initialize_asins(products, session, json_path):
+    updated = False
+
+    for product in products:
+        if product.get("asin"):
+            continue  # Skip if ASIN already exists
+
+        query = f"{product['make']} {product['model']}"
+        print(f"Finding ASIN for: {query}")
+
+        asin = get_first_asin(query, session)
+
+        if asin:
+            print("Found:", asin)
+            product["asin"] = asin
+            updated = True
+            time.sleep(2)
+        else:
+            print("ASIN not found.")
+
+    if updated:
+        with open(json_path, "w") as file:
+            json.dump({"products": products}, file, indent=2)
+        print("JSON updated with ASINs.")
 def amazon_asin(driver, make, model):
     '''Returns asin of product to search items more easily!'''
     driver.get("https://www.amazon.com/ref=nav_logo")

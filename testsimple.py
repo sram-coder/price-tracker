@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+from zoneinfo import ZoneInfo
 from datetime import datetime
 import pandas as pd
 import os
@@ -27,7 +28,7 @@ def open_json():
     return urls, products
 
 
-def get_first_asin(query, session):
+def amazon_asin(query, session):
     search_url = f"https://www.amazon.com/s?k={query.replace(' ', '+')}"
     response = session.get(search_url)
 
@@ -45,9 +46,9 @@ def get_first_asin(query, session):
 
     return None
 
-
 def amazon_product_details(asin, session, make, model):
     product_url = f"https://www.amazon.com/dp/{asin}"
+    time.sleep(random.uniform(3, 6))
     response = session.get(product_url)
 
     if "captcha" in response.text.lower():
@@ -56,15 +57,34 @@ def amazon_product_details(asin, session, make, model):
 
     soup = BeautifulSoup(response.text, "html.parser")
 
-    price_whole = soup.select_one("span.a-price-whole")
-    price_fract = soup.select_one("span.a-price-fraction")
+    data = {
+        "name": "Product not found",
+        "make": make,
+        "model": model,
+        "price": "null",
+        "merchant sin": asin,
+        "sku": "null",
+        "site": "Amazon",
+        "date": datetime.now(ZoneInfo("America/New_York"))
+    }
 
-    if price_whole and price_fract:
-        whole = price_whole.text.replace(",", "").strip()
-        fraction = price_fract.text.strip()
-        price = f"{whole}{fraction}"
-        return float(price)
-    return None
+    try:
+        # FIXED TITLE SELECTOR
+        title_el = soup.select_one("#productTitle")
+        if title_el:
+            data["name"] = title_el.text.strip()
+
+        # SAFER PRICE EXTRACTION
+        price_el = soup.select_one("span.a-offscreen")
+        if price_el:
+            raw_price = price_el.text.strip()
+            clean_price = raw_price.replace("$", "").replace(",", "")
+            data["price"] = clean_price
+
+    except Exception as e:
+        print(f"Error processing {make} {model}: {e}")
+
+    return data
 
 def main():
     ua = UserAgent(browsers=['chrome', 'firefox'])
@@ -73,19 +93,24 @@ def main():
         'User-Agent': ua.random,
         'Accept-Language': 'en-US,en;q=0.9',
         'Connection': 'keep-alive',
-        'Accept': 'application/json',
     }
 
     session = requests.Session()
     session.headers.update(headers)
-    urls, products = open_json()
+
+    urls, products_data = open_json()
+    products = products_data["products"]
 
     data_rows = []
 
     for product in products:
-        print(f"\nSearching: {product}")
+        make = product["make"]
+        model = product["model"]
+        query = f"{make} {model}"
 
-        asin = get_first_asin(product, session, product["make"], product["model"])
+        print(f"\nSearching: {query}")
+
+        asin = amazon_asin(query, session)
         if not asin:
             print("No ASIN found.")
             continue
@@ -94,29 +119,22 @@ def main():
 
         time.sleep(2)
 
-        price = amazon_product_details(asin, session)
-        if not price:
-            print("Price not found.")
+        product_data = amazon_product_details(asin, session, make, model)
+        if not product_data:
+            print("Product data not found.")
             continue
 
-        print("Price:", price)
+        print("Price:", product_data["price"])
 
-        timestamp = datetime.now()
-
-        data_rows.append({
-            "timestamp": timestamp,
-            "product_query": product,
-            "asin": asin,
-            "price": price
-        })
+        data_rows.append(product_data)
 
         time.sleep(2)
 
-
-        if data_rows:
-            today = datetime.now()
-            dir_path = f"products_data"
-            os.makedirs(dir_path, exist_ok=True)
+    # Save once after loop
+    if data_rows:
+        today = datetime.now()
+        dir_path = "products_data"
+        os.makedirs(dir_path, exist_ok=True)
 
         file_path = f"{dir_path}/{today.strftime('%Y-%m-%d')}.csv"
 
@@ -128,6 +146,5 @@ def main():
             df.to_csv(file_path, index=False)
 
         print(f"\nSaved to {file_path}")
-
 if __name__ == "__main__":
     main()
