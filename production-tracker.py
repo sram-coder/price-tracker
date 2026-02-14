@@ -8,7 +8,6 @@ def main():
 
     username = os.getenv("API_USERNAME")
     password = os.getenv("API_PASSWORD")
-
     if not username or not password:
         raise ValueError("API credentials not found in .env file.")
 
