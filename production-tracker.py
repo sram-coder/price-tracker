@@ -177,13 +177,11 @@ def walmart_product_details(make, model, username, password, location):
     #print(pretty_json)
     #product_results = first_job_result["content"]["results"]
     #print(json.dumps(product_results, indent=4))
-    # Ensure "results" exists and is non-empty
     if "results" in data and data["results"]:
         first_job_result = data["results"][0]
         content = first_job_result.get("content", {})
         product_results = content.get("results", [])
 
-        # Filters out "restored" products from search results
         filtered_products = [
             product for product in product_results
             if "restored" not in product.get("general", {}).get("title", "").lower()
