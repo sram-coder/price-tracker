@@ -231,7 +231,7 @@ def main():
 
         for site in urls.get("urls", []):
             data = {
-                "name": "Product not found",
+                        "name": "Product not found",
                         "make": make,
                         "model": model,
                         "price": "null",

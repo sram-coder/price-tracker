@@ -2,11 +2,90 @@
  "products": [
    {
      "make": "Apple",
-     "model": "Airpods Pro 3",
-     "asin": null
-     }
+     "model": "Airpods Pro 3"
+   },
+   {
+     "make": "Apple",
+     "model": "Macbook Pro M5 512GB 24 GB RAM"
+   },
+   {
+     "make": "Apple",
+     "model": "Pencil Pro"
+   },
+   {
+     "make": "Ring",
+     "model": "Spotlight Cam Plus"
+   },
+   {
+     "make": "Apple",
+     "model": "Airtag"
+   },
+   {
+     "make": "Apple",
+     "model": "35W Dual USB-C Port"
+   },
+   {
+     "make": "Apple",
+     "model": "Airpods Max"
+   },
+   {
+     "make": "Samsung",
+     "model": "Galaxy Z Flip7 512GB"
+   },
+   {
+     "make": "Oura",
+     "model": "Ring 4 Silver"
+   },
+   {
+     "make": "Fitbit",
+     "model": "Charge 6"
+   },
+   {
+     "make": "Ray-Ban",
+     "model": "Meta Gen 1"
+   },
+   {
+     "make": "Beats",
+     "model": "Solo 4"
+   },
+   {
+     "make": "Beats",
+     "model": "Studio Pro"
+   },
+   {
+     "make": "Beats",
+     "model": "Powerbeats Pro"
+   },
+   {
+     "make": "Samsung",
+     "model": "Galaxy Buds"
+   },
+   {
+     "make": "Apple",
+     "model": "iPhone 17 Pro Max"
+   },
+   {
+     "make": "Apple",
+     "model": "Watch Series 11"
+   },
+   {
+     "make": "Samsung",
+     "model": "Galaxy Watch"
+   },
+   {
+     "make": "JBL",
+     "model": "Charge 6"
+   },
+   {
+     "make": "Bose",
+     "model": "QuietComfort Ultra"
+   }
  ]
 }
+
+
+
+
 
 
 
