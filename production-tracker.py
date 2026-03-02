@@ -3,6 +3,9 @@ from pprint import pprint
 from dotenv import load_dotenv
 from datetime import datetime
 from zoneinfo import ZoneInfo
+import certifi
+import urllib3
+import asyncio
 
 def read_json_file(file_path):
     """Reads a JSON file and returns a dictionary."""
@@ -122,6 +125,8 @@ def amazon_product_details(make, model, username, password, location):
     rating = first_result["rating"]
     reviews_count = first_result["reviews_count"]
     sales_volume = first_result["sales_volume"]
+    if sales_volume == None:
+        sales_volume = "null"
 
     data = {
         "name": title,
@@ -221,11 +226,24 @@ def bestbuy_product_details(make, model, username, password, location):
         username: Username for Oxylabs API
         password: Password for Oxylabs API
         location: Zip code for store location, used as part of payload for API request'''
+    proxies = {
+        'http': f'http://{username}:{password}@realtime.oxylabs.io:60000',
+        'https': f'https://{username}:{password}@realtime.oxylabs.io:60000'
+    }
+
+    headers = {
+        'x-oxylabs-user-agent-type': 'desktop_chrome',
+        'x-oxylabs-geo-location': f'{location}',
+        'X-Oxylabs-Render': 'html',
+    }
+    urllib3.disable_warnings()
+
     payload = {
         'source': 'bestbuy_search',
         'domain': 'com',
         'query': f'{make} {model}',
-        'parse':True
+        'parse':True,
+        'render': 'html',
     }
 
     response = requests.request(
@@ -233,7 +251,9 @@ def bestbuy_product_details(make, model, username, password, location):
         'https://realtime.oxylabs.io/v1/queries',
         auth=(username, password),
         json=payload,
-
+        headers=headers,  # Pass the defined headers.
+        verify=False,  # Accept our certificate.
+        proxies=proxies,
     )
 
     if response.status_code != 200:
@@ -254,10 +274,13 @@ def main():
     password = os.getenv("API_PASSWORD")
     location = os.getenv("GEOLOCATION")
 
+
+
     if not username or not password:
         raise ValueError("API credentials not found in .env file.")
     data_list = []
     urls, products = open_json()
+
     for product in products.get("products", []):
         make = product.get("make", "")
         model = product.get("model", "")
@@ -294,7 +317,7 @@ def main():
                         }
                     data_list.append(result)
                 if "bestbuy" in site.lower():
-                    result = bestbuy_product_details(make, model, username, password, location)
+                    #result = bestbuy_product_details(make, model, username, password, location)
                     if result is None:
                         result = {
                             "name": "Product not found",
@@ -306,7 +329,7 @@ def main():
                             "site": "BestBuy",
                             "date": datetime.now(ZoneInfo("America/New_York"))
                         }
-                    data_list.append(result)
+                    #data_list.append(result)
                 if "target" in site.lower():
                     result = target_product_details(make, model, username, password, location)
                     if result is None:
