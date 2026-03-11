@@ -5,7 +5,6 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 import certifi
 import urllib3
-import asyncio
 
 def read_json_file(file_path):
     """Reads a JSON file and returns a dictionary."""
