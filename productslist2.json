@@ -80,52 +80,39 @@
      "Target ID": "89459966"
    },
    {
-     "make": "Beats",
-     "model": "Powerbeats Pro",
-     "Amazon ASIN": "B09JZ5BG26",
-     "Walmart ID": "5762417070",
+     "make": "Beats Powerbeats Pro 2",
+     "Amazon ASIN": "B0DT2344N3",
+     "Walmart ID": "15075506141",
+     "Target ID": "94617061"
+   },
+   {
+     "make": "Samsung Galaxy Buds 3 Pro",
+     "Amazon ASIN": "B0D9YZJ3V7",
+     "Walmart ID": "8470119448",
      "Target ID": "89564442"
    },
    {
-     "make": "Samsung",
-     "model": "Galaxy Buds",
+     "make": "Apple Watch Series 11",
      "Amazon ASIN": "B09JZ5BG26",
-     "Walmart ID": "5762417070",
-     "Target ID": "89564442"
+     "Walmart ID": "18715918638",
+     "Target ID": "94966472"
    },
    {
-     "make": "Apple",
-     "model": "iPhone 17 Pro Max",
-     "Amazon ASIN": "B09JZ5BG26",
-     "Walmart ID": "5762417070",
-     "Target ID": "89564442"
+     "make": "Samsung Galaxy Watch",
+     "Amazon ASIN": "B0D1YNVD88",
+     "Walmart ID": "6214656451",
+     "Target ID": "94580673"
    },
    {
-     "make": "Apple",
-     "model": "Watch Series 11",
-     "Amazon ASIN": "B09JZ5BG26",
-     "Walmart ID": "5762417070",
-     "Target ID": "89564442"
+     "make": "JBL Charge 6",
+     "Amazon ASIN": "B0DYK562B1",
+     "Walmart ID": "14330410891",
+     "Target ID": "94644913"
    },
    {
-     "make": "Samsung",
-     "model": "Galaxy Watch",
-     "Amazon ASIN": "B09JZ5BG26",
-     "Walmart ID": "5762417070",
-     "Target ID": "89564442"
-   },
-   {
-     "make": "JBL",
-     "model": "Charge 6",
-     "Amazon ASIN": "B09JZ5BG26",
-     "Walmart ID": "5762417070",
-     "Target ID": "89564442"
-   },
-   {
-     "make": "Bose",
-     "model": "QuietComfort Ultra",
-     "Amazon ASIN": "B09JZ5BG26",
-     "Walmart ID": "5762417070",
+     "make": "Bose QuietComfort Ultra",
+     "Amazon ASIN": "B0FDKR293G",
+     "Walmart ID": "16093316143",
      "Target ID": "89564442"
    }
  ]
