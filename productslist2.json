@@ -1,0 +1,132 @@
+{
+ "products": [
+   {
+     "make": "Apple Airpods Pro 3",
+     "Amazon ASIN": "B0FQFB8FMG",
+     "Walmart ID": "17835006350",
+     "Target ID": "85978609"
+   },
+   {
+     "make": "Apple Magic Mouse",
+     "Amazon ASIN": "B0DL72PK1P",
+     "Walmart ID": "14761771243",
+     "Target ID": "1010687683"
+   },
+   {
+     "make": "Apple Pencil Pro",
+     "Amazon ASIN": "B0D3J71RM7",
+     "Walmart ID": "5762417070",
+     "Target ID": "89564442"
+   },
+   {
+     "make": "Ring Spotlight Cam Plus",
+     "Amazon ASIN": "B09JZ5BG26",
+     "Walmart ID": "19470612121",
+     "Target ID": "89116442"
+   },
+   {
+     "make": "Apple Macbook Neo 512GB",
+     "Amazon ASIN": "B09JZ5BG26",
+     "Walmart ID": "19682700559",
+     "Target ID": "95288385"
+   },
+   {
+     "make": "Apple 35W Dual USB-C Port",
+     "Amazon ASIN": "B0D1XRRQZJ",
+     "Walmart ID": "5539894453",
+     "Target ID": "85963538"
+   },
+   {
+     "make": "Apple Airpods Max 2",
+     "Amazon ASIN": "B0GSS72GZJ",
+     "Walmart ID": "19897915079",
+     "Target ID": "1010453160"
+   },
+   {
+     "make": "Samsung Galaxy Z Flip7 512GB",
+     "Amazon ASIN": "B0F7K4BRZJ",
+     "Walmart ID": "16860058829",
+     "Target ID": "1009757769"
+   },
+   {
+     "make": "Oura Ring 4 Silver",
+     "Amazon ASIN": "B0D9WT1S2T",
+     "Walmart ID": "17926869500",
+     "Target ID": "93747936"
+   },
+   {
+     "make": "Fitbit Charge 6",
+     "Amazon ASIN": "B0CC62ZG1M",
+     "Walmart ID": "5087333627",
+     "Target ID": "90042771"
+   },
+   {
+     "make": "Ray-Ban Meta Gen 1",
+     "Amazon ASIN": "B0CGXYVQ1P",
+     "Walmart ID": "15643554485",
+     "Target ID": "94937666"
+   },
+   {
+     "make": "Beats Solo 4",
+     "model": "",
+     "Amazon ASIN": "B0DDQLGDY3",
+     "Walmart ID": "17203508556",
+     "Target ID": "91975105"
+   },
+   {
+     "make": "Beats Studio Pro",
+     "Amazon ASIN": "B0C8PR4W22",
+     "Walmart ID": "1575006069",
+     "Target ID": "89459966"
+   },
+   {
+     "make": "Beats",
+     "model": "Powerbeats Pro",
+     "Amazon ASIN": "B09JZ5BG26",
+     "Walmart ID": "5762417070",
+     "Target ID": "89564442"
+   },
+   {
+     "make": "Samsung",
+     "model": "Galaxy Buds",
+     "Amazon ASIN": "B09JZ5BG26",
+     "Walmart ID": "5762417070",
+     "Target ID": "89564442"
+   },
+   {
+     "make": "Apple",
+     "model": "iPhone 17 Pro Max",
+     "Amazon ASIN": "B09JZ5BG26",
+     "Walmart ID": "5762417070",
+     "Target ID": "89564442"
+   },
+   {
+     "make": "Apple",
+     "model": "Watch Series 11",
+     "Amazon ASIN": "B09JZ5BG26",
+     "Walmart ID": "5762417070",
+     "Target ID": "89564442"
+   },
+   {
+     "make": "Samsung",
+     "model": "Galaxy Watch",
+     "Amazon ASIN": "B09JZ5BG26",
+     "Walmart ID": "5762417070",
+     "Target ID": "89564442"
+   },
+   {
+     "make": "JBL",
+     "model": "Charge 6",
+     "Amazon ASIN": "B09JZ5BG26",
+     "Walmart ID": "5762417070",
+     "Target ID": "89564442"
+   },
+   {
+     "make": "Bose",
+     "model": "QuietComfort Ultra",
+     "Amazon ASIN": "B09JZ5BG26",
+     "Walmart ID": "5762417070",
+     "Target ID": "89564442"
+   }
+ ]
+}
