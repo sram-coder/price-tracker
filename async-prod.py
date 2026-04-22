@@ -173,6 +173,7 @@ async def main():
             make = product.get("make", "")
             model = product.get("model", "")
 
+
             for site in urls.get("urls", []):
 
                 if "amazon" in site.lower():

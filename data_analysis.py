@@ -1,21 +1,27 @@
 #Author: Sharanya Ram
 import pandas as pd
 import glob
-import numpy as np
 import matplotlib.pyplot as plt
 import os
+from sklearn.linear_model import LinearRegression
+import numpy as np
+
 
 os.makedirs("outputs", exist_ok=True)
 
 # Get all CSV files from products_data
 csv_files = sorted(glob.glob("products_data/*.csv"))
-
 if not csv_files:
     print("No CSV files found")
     exit()
 
 # Read and combine!
-df_list = [pd.read_csv(file) for file in csv_files]
+df_list = [
+    pd.read_csv(file)
+    for file in csv_files
+    if os.path.getsize(file) > 0  # skip empty files
+]
+
 uncleaned_combined_df = pd.concat(df_list, ignore_index=True)
 combined_df = pd.concat(df_list, ignore_index=True)
 
@@ -53,7 +59,7 @@ combined_df.to_csv("outputs/combined_cleaned.csv", index=False)
 models = combined_df["model"].unique()
 
 plt.style.use('seaborn-v0_8')
-plt.title("Price Trends Over Time", fontsize=20, weight='bold')
+plt.title("", fontsize=20, weight='bold')
 plt.xlabel("Date", fontsize=14)
 plt.tight_layout()
 plt.ylabel("Price ($)", fontsize=14)
@@ -68,11 +74,10 @@ ax.spines['right'].set_visible(False)
 count = 0
 
 combined_df["date"] = pd.to_datetime(combined_df["date"]).dt.floor("D")
-combined_df = combined_df.sort_values("date")
-
 for model, model_df in combined_df.groupby("model"):
 
     plt.figure(figsize=(10, 6))
+    plt.title(f"{model}", fontsize=20, weight='bold')
 
     full_range = pd.date_range(
         start=model_df["date"].min(),
@@ -108,4 +113,77 @@ for model, model_df in combined_df.groupby("model"):
     plt.close()
 
     count += 1
+
+#predictive analysis
+combined_df["date"] = combined_df["date"].dt.tz_localize(None)
+
+for model, model_df in combined_df.groupby("model"):
+
+    plt.figure(figsize=(10, 6))
+    plt.title(f"{model}")
+
+    full_range = pd.date_range(
+        start=model_df["date"].min(),
+        end=model_df["date"].max(),
+        freq="D"
+    )
+
+    for site, site_df in model_df.groupby("site"):
+
+        site_df = site_df.copy()
+
+        # Daily average per site
+        daily_avg = (
+            site_df
+            .set_index("date")
+            .groupby("date")["price"]
+            .mean()
+        )
+
+        daily_avg = daily_avg.reindex(full_range)
+        daily_avg = daily_avg.ffill()
+
+        if daily_avg.isna().all():
+            continue
+
+        # --- ACTUAL LINE ---
+        plt.plot(full_range, daily_avg.values, label=f"{site}")
+
+        # --- LINEAR REGRESSION ---
+        df_lr = pd.DataFrame({
+            "date": full_range,
+            "price": daily_avg.values
+        }).dropna()
+
+        if len(df_lr) < 2:
+            continue
+
+        df_lr["date_ordinal"] = df_lr["date"].map(pd.Timestamp.toordinal)
+
+        X = df_lr["date_ordinal"].values.reshape(-1, 1)
+        y = df_lr["price"].values
+
+        lr = LinearRegression()
+        lr.fit(X, y)
+
+        # Predict next 30 days
+        future_dates = pd.date_range(full_range.max(), periods=30)
+        future_ordinals = future_dates.map(pd.Timestamp.toordinal).values.reshape(-1, 1)
+
+        predictions = lr.predict(future_ordinals)
+
+        # --- PREDICTED LINE ---
+        plt.plot(
+            future_dates,
+            predictions,
+            linestyle="--",
+            label=f"{site} (pred)"
+        )
+
+    plt.legend()
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    plt.savefig(f"outputs/predicted_{model}.png")
+    plt.close()
 
