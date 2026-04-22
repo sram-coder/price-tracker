@@ -13,7 +13,7 @@ app = Dash(__name__)
 app.layout = html.Div([
     html.H4('Price Change of Product Over Time'),
 
-    # DROPDOWN instead of checklist
+    # DROPDOWN menu for products
     dcc.Dropdown(
         id="product-dropdown",
         options=[
@@ -61,9 +61,7 @@ def update_line_chart(selected_model, mode):
         title=f"{selected_model} Price Trends by Site"
     )
 
-    # -----------------------------
-    # ADD FORECAST LINES
-    # -----------------------------
+    # linear regression forecast :)
     if mode == "forecast":
 
         for site, site_df in df.groupby("site"):
