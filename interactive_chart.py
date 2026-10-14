@@ -94,4 +94,4 @@ def update_line_chart(selected_model, mode):
     return fig
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=False)
+    app.run(host="0.0.0.0", port=5000, debug=False)
